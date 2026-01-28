@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ro" data-lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <title>Dopomoha — A4 One‑Pager (Multilingual Switcher)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* ===== Print & Layout ===== */
+    @page { size: A4; margin: 18mm; }
+    html, body { height: 100%; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif; color: #111; margin: 0; background: #fff; font-size: 11.2pt; line-height: 1.4; }
+    .page { max-width: 174mm; margin: 0 auto; }
+    h1, h2, h3 { margin: 0 0 6pt; line-height: 1.15; }
+    h1 { font-size: 20pt; letter-spacing: 0.2px; }
+    h2 { font-size: 12.8pt; margin-top: 10pt; }
+    p, li { orphans: 2; widows: 2; }
+    section { break-inside: avoid; margin-bottom: 10pt; }
+    .muted { color: #666; }
+
+    /* ===== Brand ===== */
+    :root { --brand-primary:#005BBB; --brand-secondary:#FFD500; --ink:#111111; --ink-2:#555; --line:#E6EEF9; }
+    .topbar { display:flex; align-items:center; gap: 12mm; border-bottom:1.2pt solid var(--line); padding-bottom:10pt; }
+    .logo-box { width:28mm; height:28mm; border:1.2pt dashed var(--brand-primary); display:grid; place-items:center; border-radius:4mm; background:linear-gradient(135deg, rgba(0,91,187,.06), rgba(255,213,0,.06)); font-size:8pt; color:var(--ink-2); }
+    .brand-title { display:grid; gap:4pt; }
+    .brand-title h1 { color:var(--brand-primary); font-weight:700; }
+    .swatches { display:flex; gap:8pt; margin-top:6pt; }
+    .swatch { display:grid; grid-template-columns:12mm 1fr; gap:6pt; align-items:center; font-size:9pt; color:var(--ink-2); }
+    .chip { width:12mm; height:7mm; border-radius:1.5mm; border:.4pt solid #c8c8c8; }
+    .chip.primary { background:var(--brand-primary); border-color:var(--brand-primary); }
+    .chip.secondary { background:var(--brand-secondary); border-color:var(--brand-secondary); }
+
+    /* ===== Language Switcher ===== */
+    .lang-switch { display:flex; gap:6pt; align-items:center; margin-top:2pt; }
+    .lang-switch button { border: .8pt solid var(--line); background:#fff; padding:4pt 8pt; border-radius:10mm; font-size:9.6pt; cursor:pointer; }
+    .lang-switch button[aria-pressed="true"] { border-color:var(--brand-primary); color:var(--brand-primary); font-weight:600; }
+
+    .tagline { font-size:9.6pt; color:var(--ink-2); margin-top:2pt; }
+
+    /* ===== Responsive Acronym Grid (space‑mindful) ===== */
+    /* Mobile‑first: 2 cols (4 rows for 8 items) → Tablet: 3 cols → Desktop/Print: 4 cols (2 rows) */
+    .grid {
+      display: grid;
+      grid-auto-flow: row dense;          /* fill gaps tightly */
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6pt;                            /* slightly tighter spacing */
+      margin-top: 6pt;
+      align-items: start;                  /* prevent cards from stretching */
+    }
+    @media screen and (min-width: 720px) {
+      .grid { grid-template-columns: repeat(3, 1fr); } /* ~3 cols, ~3 rows for 8 */
+    }
+    @media screen and (min-width: 1024px) {
+      .grid { grid-template-columns: repeat(4, 1fr); } /* 4 cols, 2 rows for 8 */
+    }
+
+    .card {
+      border: .7pt solid var(--line);
+      border-radius: 3mm;
+      padding: 6pt;                        /* compact padding */
+      display: block;                      /* avoid flex stretching */
+      word-break: break-word;
+      hyphens: auto;
+      align-self: start;                   /* natural height per card */
+      background: #fff;
+    }
+    .pill { display:inline-grid; place-items:center; width:7mm; height:7mm; border-radius:50%; background:var(--brand-primary); color:#fff; font-weight:700; font-size:9pt; margin-right:6pt; }
+    .kv { display:flex; align-items:center; font-weight:600; margin-bottom:2pt; }
+    .kv small { font-weight:500; color:var(--ink-2); margin-left:4pt; }
+    .kicker { font-size:9.2pt; color:var(--ink-2); }
+
+    /* Very small screens: single column fallback */
+    @media screen and (max-width: 380px) { .grid { grid-template-columns: 1fr; } }
+
+    /* Print: lock to 4 columns for the A4 export (2 rows for 8 items) */
+    @media print { .lang-switch { display:none !important; } .grid { grid-template-columns: repeat(4, 1fr) !important; gap: 6pt; } }
+
+    /* Lists */
+    ul { margin:4pt 0 0 14pt; padding:0; }
+    li + li { margin-top:2pt; }
+
+    /* Two column body */
+    .cols { display:grid; grid-template-columns:1fr 1fr; gap:10pt; }
+    .kicker { font-size:9.5pt; color:var(--ink-2); }
+
+    /* Footer */
+    footer { border-top:1.2pt solid var(--line); margin-top:8pt; padding-top:6pt; display:flex; justify-content:space-between; font-size:9pt; color:var(--ink-2); }
+    .accent-underline { height:2.5pt; background:linear-gradient(90deg, var(--brand-primary), var(--brand-secondary)); border-radius:2pt; margin:8pt 0 0; }
+
+    /* Screen tweak */
+    @media screen { body { background:#fafafa; } .page { background:#fff; box-shadow:0 6px 24px rgba(0,0,0,.06); margin:16px auto; padding:16px; } }
+
+    /* ===== Language visibility ===== */
+    .lang { display:none; }
+    [data-lang="ro"] .lang.ro,
+    [data-lang="en"] .lang.en,
+    [data-lang="ukr"] .lang.ukr,
+    [data-lang="ru"] .lang.ru { display:block; }
+    /* Ensure grid containers remain grids when visible */
+    [data-lang="ro"] .grid.lang.ro,
+    [data-lang="en"] .grid.lang.en,
+    [data-lang="ukr"] .grid.lang.ukr,
+    [data-lang="ru"] .grid.lang.ru { display:grid; }
+  </style>
+</head>
+<body>
+  <main class="page">
+
+    <!-- Header with language switcher -->
+    <section class="topbar">
+      <div class="logo-box">LOGO<br/>PLACEHOLDER</div>
+      <div class="brand-title">
+        <h1>Dopomoha</h1>
+        <div class="lang-switch" role="tablist" aria-label="Language">
+          <button data-setlang="ro" aria-pressed="true" aria-label="Română (RO)">RO</button>
+          <button data-setlang="en" aria-pressed="false" aria-label="English (EN)">EN</button>
+          <button data-setlang="ukr" aria-pressed="false" aria-label="Українська (UKR)">UKR</button>
+          <button data-setlang="ru" aria-pressed="false" aria-label="Русский (RU)">RU</button>
+        </div>
+        <div class="tagline lang ro">Umanitate în acțiune.</div>
+        <div class="tagline lang en">Humanity in action.</div>
+        <div class="tagline lang ukr">Людяність у дії.</div>
+        <div class="tagline lang ru">Гуманность в действии.</div>
+        <div class="swatches">
+          <div class="swatch"><div class="chip primary"></div><div>Primary <b>#005BBB</b></div></div>
+          <div class="swatch"><div class="chip secondary"></div><div>Secondary <b>#FFD500</b></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acronym grid (per language) -->
+    <section>
+      <h2 class="lang ro">Acronim — <strong>DOPOMOHA</strong></h2>
+      <h2 class="lang en">Acronym — <strong>DOPOMOHA</strong></h2>
+      <h2 class="lang ukr">Акронім — <strong>DOPOMOHA</strong></h2>
+      <h2 class="lang ru">Акроним — <strong>DOPOMOHA</strong></h2>
+
+      <div class="grid lang ro">
+        <div class="card"><div class="kv"><span class="pill">D</span>Demnitate <small>(Dignity)</small></div><div class="kicker">Dezvoltare · Diversitate</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Oportunitate</div><div class="kicker">Optimism · Outreach</div></div>
+        <div class="card"><div class="kv"><span class="pill">P</span>Pace</div><div class="kicker">Progres · Parteneriat</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Deschidere</div><div class="kicker">Depășire · Responsabilizare</div></div>
+        <div class="card"><div class="kv"><span class="pill">M</span>Mobilizare</div><div class="kicker">Mișcare · Momentum</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Oportunitate</div><div class="kicker">Outreach continuu · Optimism</div></div>
+        <div class="card"><div class="kv"><span class="pill">H</span>Umanitate</div><div class="kicker">Speranță · Vindecare</div></div>
+        <div class="card"><div class="kv"><span class="pill">A</span>Ajutor</div><div class="kicker">Advocacy · Acțiune</div></div>
+      </div>
+
+      <div class="grid lang en">
+        <div class="card"><div class="kv"><span class="pill">D</span>Dignity</div><div class="kicker">Development · Diversity</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Opportunity</div><div class="kicker">Optimism · Outreach</div></div>
+        <div class="card"><div class="kv"><span class="pill">P</span>Peace</div><div class="kicker">Progress · Partnership</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Open‑mindedness</div><div class="kicker">Overcoming · Ownership</div></div>
+        <div class="card"><div class="kv"><span class="pill">M</span>Mobilization</div><div class="kicker">Movement · Momentum</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Opportunity</div><div class="kicker">Continuous outreach · Optimism</div></div>
+        <div class="card"><div class="kv"><span class="pill">H</span>Humanity</div><div class="kicker">Hope · Healing</div></div>
+        <div class="card"><div class="kv"><span class="pill">A</span>Aid</div><div class="kicker">Advocacy · Action</div></div>
+      </div>
+
+      <div class="grid lang ukr">
+        <div class="card"><div class="kv"><span class="pill">D</span>Гідність</div><div class="kicker">Розвиток · Різноманіття</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Можливості</div><div class="kicker">Оптимізм · Розширення (Outreach)</div></div>
+        <div class="card"><div class="kv"><span class="pill">P</span>Мир</div><div class="kicker">Прогрес · Партнерство</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Відкритість</div><div class="kicker">Подолання · Суб’єктність</div></div>
+        <div class="card"><div class="kv"><span class="pill">M</span>Мобілізація</div><div class="kicker">Рух · Моментум</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Можливості</div><div class="kicker">Безперервний outreach · Оптимізм</div></div>
+        <div class="card"><div class="kv"><span class="pill">H</span>Людяність</div><div class="kicker">Надія · Зцілення</div></div>
+        <div class="card"><div class="kv"><span class="pill">A</span>Допомога</div><div class="kicker">Адвокація · Дія</div></div>
+      </div>
+
+      <div class="grid lang ru">
+        <div class="card"><div class="kv"><span class="pill">D</span>Достоинство</div><div class="kicker">Развитие · Разнообразие</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Возможности</div><div class="kicker">Оптимизм · Outreach (расширение)</div></div>
+        <div class="card"><div class="kv"><span class="pill">P</span>Мир</div><div class="kicker">Прогресс · Партнёрство</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Открытость</div><div class="kicker">Преодоление · Самоответственность</div></div>
+        <div class="card"><div class="kv"><span class="pill">M</span>Мобилизация</div><div class="kicker">Движение · Импульс</div></div>
+        <div class="card"><div class="kv"><span class="pill">O</span>Возможности</div><div class="kicker">Непрерывный outreach · Оптимизм</div></div>
+        <div class="card"><div class="kv"><span class="pill">H</span>Гуманность</div><div class="kicker">Надежда · Исцеление</div></div>
+        <div class="card"><div class="kv"><span class="pill">A</span>Помощь</div><div class="kicker">Адвокация · Действие</div></div>
+      </div>
+
+      <div class="accent-underline"></div>
+    </section>
+
+    <!-- Two columns: Principles & Objectives -->
+    <section class="cols">
+      <!-- RO -->
+      <div class="lang ro">
+        <h2>Principii Directoare</h2>
+        <ul>
+          <li><strong>Abordare bazată pe drepturile omului</strong> — toate acțiunile respectă și promovează drepturile omului.</li>
+          <li><strong>Gândire sistemică</strong> — inițiative concepute pentru impact holist, cu relațiile sistemice în vedere.</li>
+          <li><strong>Abordare bazată pe date</strong> — strategii și operațiuni ghidate de date; prioritate pentru cei în cea mai mare nevoie.</li>
+        </ul>
+      </div>
+      <div class="lang ro">
+        <h2>Scopurile Asociației</h2>
+        <ul>
+          <li><strong>a)</strong> Inovație socială integrată în cultură, educație, sport și tehnologie, prin soluții tehnologice și organizaționale pentru beneficiul populațiilor vulnerabile.</li>
+          <li><strong>b)</strong> Dezvoltarea de modele de inovare socială prin cercetare, parteneriate și soluții inovative accesibile publicului, cu beneficii practice și coeziune socială.</li>
+          <li><strong>c)</strong> Administrarea și dezvoltarea Inițiativei <em>„Moldova pentru Pace”</em>: atragere de fonduri, implementare de proiecte, impact social și extindere organizațională.</li>
+          <li><strong>d)</strong> Consolidarea relațiilor interetnice prin dialog, mediere și cooperare între minorități și grupuri etnice, în spiritul drepturilor omului și respectului reciproc.</li>
+          <li><strong>e)</strong> Promovarea dialogului și schimbului cultural între minorități și grupuri etnice; protejarea și valorizarea patrimoniului, limbilor și tradițiilor prin evenimente, rezidențe, ateliere, mobilități artistice și programe pentru tineri.</li>
+          <li><strong>f)</strong> Promovarea și dezvoltarea antreprenoriatului social și susținerea întreprinderilor sociale, în conformitate cu legislația Republicii Moldova, inclusiv prin programe educaționale, mentorat și facilitarea accesului la sprijin financiar nerambursabil.</li>
+        </ul>
+      </div>
+
+      <!-- EN -->
+      <div class="lang en">
+        <h2>Guiding Principles</h2>
+        <ul>
+          <li><strong>Human‑rights‑based approach</strong> — all actions respect and promote human rights.</li>
+          <li><strong>Systems thinking</strong> — initiatives designed for holistic impact, accounting for systemic relationships.</li>
+          <li><strong>Data‑informed approach</strong> — strategies and operations guided by data; priority to those in greatest need.</li>
+        </ul>
+      </div>
+      <div class="lang en">
+        <h2>Association Objectives</h2>
+        <ul>
+          <li><strong>a)</strong> Integrated social innovation in culture, education, sports, and technology, via technological and organizational solutions benefiting vulnerable populations.</li>
+          <li><strong>b)</strong> Develop social‑innovation models through research, partnerships, and innovative solutions accessible to the public, delivering practical benefits and strengthening social cohesion.</li>
+          <li><strong>c)</strong> Administer and develop the <em>“Moldova for Peace”</em> Initiative: fund‑raising, project implementation, social impact, and organizational capacity building.</li>
+          <li><strong>d)</strong> Strengthen interethnic relations through dialogue, mediation, and cooperation among minorities and ethnic groups, in the spirit of human rights and mutual respect.</li>
+          <li><strong>e)</strong> Promote cultural dialogue and exchange among minorities and ethnic groups; protect and enhance heritage, languages, and traditions through events, residencies, workshops, artistic mobility, and youth programs.</li>
+          <li><strong>f)</strong> Promote and develop social entrepreneurship and support social enterprises, in line with the legislation of the Republic of Moldova, including education programs, mentorship, and access to non‑reimbursable financial support (grants).</li>
+        </ul>
+      </div>
+
+      <!-- UKR -->
+      <div class="lang ukr">
+        <h2>Керівні принципи</h2>
+        <ul>
+          <li><strong>Підхід, заснований на правах людини</strong> — усі дії поважають і просувають права людини.</li>
+          <li><strong>Системне мислення</strong> — ініціативи, спроєктовані для цілісного впливу з урахуванням системних зв’язків.</li>
+          <li><strong>Підхід, заснований на даних</strong> — стратегії та операції керуються даними; пріоритет — тим, хто має найнагальнішу потребу.</li>
+        </ul>
+      </div>
+      <div class="lang ukr">
+        <h2>Цілі Асоціації</h2>
+        <ul>
+          <li><strong>a)</strong> Інтегровані соціальні інновації в сферах культури, освіти, спорту та технологій через технологічні й організаційні рішення на користь вразливих груп населення.</li>
+          <li><strong>b)</strong> Розробка моделей соціальних інновацій через дослідження, партнерства та інноваційні рішення, доступні громадськості, що приносять практичну користь і зміцнюють соціальну згуртованість.</li>
+          <li><strong>c)</strong> Адміністрування та розвиток Ініціативи <em>«Moldova for Peace»</em>: залучення фінансування, реалізація проєктів, соціальний вплив і розширення організаційної спроможності.</li>
+          <li><strong>d)</strong> Зміцнення міжетнічних відносин через діалог, медіацію та співпрацю між меншинами й етнічними групами у дусі прав людини та взаємної поваги.</li>
+          <li><strong>e)</strong> Сприяння культурному діалогу та обміну між меншинами й етнічними групами; захист і популяризація спадщини, мов і традицій через події, резиденції, майстерні, мистецькі мобільності та молодіжні програми.</li>
+          <li><strong>f)</strong> Сприяння розвитку соціального підприємництва та підтримці соціальних підприємств відповідно до законодавства Республіки Молдова, включно з освітніми програмами, наставництвом і доступом до безповоротної фінансової підтримки (грантів).</li>
+        </ul>
+      </div>
+
+      <!-- RU -->
+      <div class="lang ru">
+        <h2>Руководящие принципы</h2>
+        <ul>
+          <li><strong>Подход, основанный на правах человека</strong> — все действия уважают и продвигают права человека.</li>
+          <li><strong>Системное мышление</strong> — инициативы, спроектированные для целостного воздействия с учётом системных взаимосвязей.</li>
+          <li><strong>Подход, основанный на данных</strong> — стратегии и операции руководствуются данными; приоритет — тем, кто в наибольшей нужде.</li>
+        </ul>
+      </div>
+      <div class="lang ru">
+        <h2>Цели Ассоциации</h2>
+        <ul>
+          <li><strong>a)</strong> Интегрированные социальные инновации в сферах культуры, образования, спорта и технологий посредством технологических и организационных решений в интересах уязвимых групп населения.</li>
+          <li><strong>b)</strong> Разработка моделей социальных инноваций через исследования, партнёрства и инновационные решения, доступные общественности, приносящие практическую пользу и укрепляющие социальную сплочённость.</li>
+          <li><strong>c)</strong> Администрирование и развитие Инициативы <em>«Moldova for Peace»</em>: привлечение финансирования, реализация проектов, социальный эффект и расширение организационного потенциала.</li>
+          <li><strong>d)</strong> Укрепление межэтнических отношений через диалог, медиацию и сотрудничество между меньшинствами и этническими группами в духе прав человека и взаимного уважения.</li>
+          <li><strong>e)</strong> Продвижение культурного диалога и обмена между меньшинствами и этническими группами; защита и популяризация наследия, языков и традиций посредством мероприятий, резиденций, мастерских, художественных мобильностей и молодёжных программ.</li>
+          <li><strong>f)</strong> Продвижение и развитие социального предпринимательства и поддержка социальных предприятий в соответствии с законодательством Республики Молдова, включая образовательные программы, наставничество и доступ к безвозмездной финансовой поддержке (грантам).</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      <div>Rev. 2025‑10‑07 · A4 — Multilingual Switcher (Responsive Grid)</div>
+      <div class="muted">Change colors in CSS vars <code>--brand-*</code> · Selected language prints only</div>
+    </footer>
+
+  </main>
+
+  <script>
+    (function(){
+      const root = document.documentElement;
+      const buttons = document.querySelectorAll('[data-setlang]');
+      const saved = localStorage.getItem('dopomoha_lang');
+      const initial = saved || root.getAttribute('data-lang') || 'ro';
+      setLang(initial);
+
+      buttons.forEach(btn => { btn.addEventListener('click', () => setLang(btn.dataset.setlang)); });
+
+      function setLang(code){
+        root.setAttribute('data-lang', code);
+        buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setlang===code)));
+        try { localStorage.setItem('dopomoha_lang', code); } catch(e){}
+      }
+    })();
+  </script>
+</body>
+</html>
